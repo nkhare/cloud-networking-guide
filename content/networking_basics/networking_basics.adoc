@@ -8,9 +8,41 @@
 :numbered:
 
 == OSI Model
-tbd
+The Open System Interconnection (OSI) model is a network map which was originally created to serve as a universal standard for creating networks, however, nowadays its more of a teaching tool. It basically defines how different tasks should be handled in order to have error free data transmission. The OSI layer is divided into 7 layers and the way the layers are divided gives this model some characteristic features.
+
+The layers are : (from lowest to highest)
+Physical Layer (Layer 1)
+
+:  This layer represents the actual fiber/lan cables that connect the systems. It is the most basic layer and represents the actual transfer of bits in the form of electrical signal.
+Data Link Layer :
+
+  At this layer the bits/raw data is converted into a packet or a frame which is then passed to the upper layers and the opposite mechanism happens when a packet arrives from the upper layer. This layer is also responsible for detecting and correcting any errors that occur at the physical layer.
+Network Layer :
+
+As the name suggests, this layer helps in the networking of the packet i.e. it determines the destination of a packet whether it is a incoming or outgoing packet. It handles the routing part i.e. to find the best path to the destination and also handles issues like network congestion and packet switching. The destination here is represented by an IP address.
+Transport Layer :
+
+This layer handles the communication between nodes, it doesn't directly concern with packets. So, at this layer we can check if the packet was actually received by the target node. It differs from the Networking Layer in the sense that it can see at which port the data transmission is taking place.
+Session Layer :
+
+Here the connections are made, maintained and ended. It is different from the transport layer in the sense that the transport layer only concerns with a single connection that it is handling at that time while the session layer handles all the connections or conversations between the host node (for example you machine) and the target machines, which are requested by different applications.
+Presentations Layer :
+
+We can consider this as the gateway to a application. It converts the incoming packet in a form that an application desires. For example it will decrypt an encrypted packet and then deliver it to the application in the format desired.
+Application Layer (Layer 7) :
+
+This layer coordinates all the requests made by the different applications running on the host machine. It will break down those requests into a structure that the layers below it understand.
+
+Sometimes the Session, Presentation and Application layer are together called Application layer.
 
 == Bridge, Switch, Router
+In the Computer Networks domain there are typically two main class of devices : bridges or switches and routers.
+## Linux Bridge ##
+
+A linux-bridge is similar to a hardware bridge except for a few more additional capabilities. A hardware bridge has functionalities like broadcasting, learning and forwarding, which I will explain in detail shortly, to help it to manage the transfer of packets.
+
+ - **Broadcasting** : Think about the scenario when a new node is connected to the bridge. The bridge has no way of knowing the address of this node. So what happens when a packet is sent to this new node ? Since the bridge does not know on which port this node is connected, it will broadcast the packet to all of its ports, which will ensure that the destination node will receive the packet if it is reachable from the bridge.
+
 
 == How two machines communicate within LAN
 tbd
