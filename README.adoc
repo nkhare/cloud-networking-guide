@@ -15,7 +15,12 @@ This cheat sheet is also very helpful: http://powerman.name/doc/asciidoc
 
 === Linux
 
-. yum install git asciidoc docbook-xsl fop
+. Install required packages, on Fedora 
++
+----
+yum install git asciidoc docbook-xsl fop
+----
+
 . Edit /etc/asciidoc/asciidoc.conf and change the following
 +
 ----
