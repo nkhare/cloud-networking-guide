@@ -1,0 +1,12 @@
+// vim: set syntax=asciidoc:
+[[openstack_networking]]
+= Openstack Networking
+:data-uri:
+:icons:
+:toc:
+:toclevels 4:
+:numbered:
+
+== Networking
+tbd
+

@@ -1,0 +1,23 @@
+// vim: set syntax=asciidoc:
+[[networking_basics]]
+= Networking Basics
+:data-uri:
+:icons:
+:toc:
+:toclevels 4:
+:numbered:
+
+== OSI Model
+tbd
+
+== Bridge, Switch, Router
+
+== How two machines communicate within LAN
+tbd
+
+== How two machines within two LANs communicate
+tdb
+
+==  How Internet works ?
+tbd
+
