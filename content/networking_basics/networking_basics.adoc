@@ -7,17 +7,71 @@
 :toclevels 4:
 :numbered:
 
+
+== Introduction
+
+Over the last year or two, in the field of networking, you might often have heard or had to deal with the term Software Defined Networking (SDN) and Network Virtualization (NV). But many people seem confused about these topics and cannot seem to get a grasp on the core ideas involved. They generally interact with only a few among a large pool of solutions. As a result their understanding is  focused more on a few solutions rather than having a basic understanding of the concepts. The goal of this write-up is for the reader to first develop a basic understanding of networking concepts so that she/he can then grasp the meaning of the topics mentioned. If you are already familiar with the networking concepts then please go directly to the SDN part.
+
+Now, for the time being, let’s forget about SDN or NV and delve into the fundamentals of networking.
+Networking
+
+Well you all have some sort of understanding as to what is networking is. We see networking in various facets of our life as well – social networks, railway networks, road networks, etc .. Well computer networks are not that different          conceptually, its just that a computer network has well defined standard features and ways to communicate, so that we can scale easily.
+
 == OSI Model
-tbd
 
-== Bridge, Switch, Router
+The Open System Interconnection (OSI) model is a network map which was originally created to serve as a universal standard for creating networks, however, nowadays its more of a teaching tool. It basically defines how different tasks should be handled in order to have error free data transmission. The OSI layer is divided into 7 layers and the way the layers are divided gives this model some characteristic features.
 
-== How two machines communicate within LAN
-tbd
+The layers are : (from lowest to highest)
+Physical Layer (Layer 1)
 
-== How two machines within two LANs communicate
-tdb
+:  This layer represents the actual fiber/lan cables that connect the systems. It is the most basic layer and represents the actual transfer of bits in the form of electrical signal.
+Data Link Layer :
 
-==  How Internet works ?
-tbd
+  At this layer the bits/raw data is converted into a packet or a frame which is then passed to the upper layers and the opposite mechanism happens when a packet arrives from the upper layer. This layer is also responsible for detecting and correcting any errors that occur at the physical layer.
+Network Layer :
 
+As the name suggests, this layer helps in the networking of the packet i.e. it determines the destination of a packet whether it is a incoming or outgoing packet. It handles the routing part i.e. to find the best path to the destination and also handles issues like network congestion and packet switching. The destination here is represented by an IP address.
+Transport Layer :
+
+This layer handles the communication between nodes, it doesn't directly concern with packets. So, at this layer we can check if the packet was actually received by the target node. It differs from the Networking Layer in the sense that it can see at which port the data transmission is taking place.
+Session Layer :
+
+Here the connections are made, maintained and ended. It is different from the transport layer in the sense that the transport layer only concerns with a single connection that it is handling at that time while the session layer handles all the connections or conversations between the host node (for example you machine) and the target machines, which are requested by different applications.
+Presentations Layer :
+
+We can consider this as the gateway to a application. It converts the incoming packet in a form that an application desires. For example it will decrypt an encrypted packet and then deliver it to the application in the format desired.
+Application Layer (Layer 7) :
+
+This layer coordinates all the requests made by the different applications running on the host machine. It will break down those requests into a structure that the layers below it understand.
+
+Sometimes the Session, Presentation and Application layer are together called Application layer.
+
+== Protocols
+
+A network protocol is a set of rules that govern how to computer communicate. It can be considered as a universal language that all computers must speak so that they can understand each other. Well, instead of a single language for everything we have a set of protocols that are defined for different layers of the OSI model. Now let us have a look at different network protocols in the order of the OSI Layers :
+
+Physical Layer protocols :  The protocols at physical layer deal with the hardware components of networking. For example the type of Ethernet cable simplex/duplex, twisted cable, etc ..
+Communication between two Devices
+
+When we talk about communication between two devices, it can be of many types depending on how many layers from the OSI-Layer they support. Here are a few devices and the layers they support :
+
+    Router : Network Layer
+    Bridge : Data Link Layer
+    Computer : Application Layer
+
+== Standard Network devices
+
+In the Computer Networks domain there are typically two main class of devices : bridges or switches and routers.
+## Linux Bridge ##
+
+A linux-bridge is similar to a hardware bridge except for a few more additional capabilities. A hardware bridge has functionalities like broadcasting, learning and forwarding, which I will explain in detail shortly, to help it to manage the transfer of packets.
+
+ - **Broadcasting** : Think about the scenario when a new node is connected to the bridge. The bridge has no way of knowing the address of this node. So what happens when a packet is sent to this new node ? Since the bridge does not know on which port this node is connected, it will broadcast the packet to all of its ports, which will ensure that the destination node will receive the packet if it is reachable from the bridge.
+
+== Types of Networks
+
+== What is Software defined Networking or SDN ?
+
+== Virtual Networks
+
+== Tunneling
