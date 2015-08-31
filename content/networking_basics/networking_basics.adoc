@@ -10,6 +10,10 @@
 == OSI Model
 The Open System Interconnection (OSI) model is a network map which was originally created to serve as a universal standard for creating networks, however, nowadays its more of a teaching tool. It basically defines how different tasks should be handled in order to have error free data transmission. The OSI layer is divided into 7 layers and the way the layers are divided gives this model some characteristic features.
 
+[[osi-layes]]
+.OSI Layer
+image::osi.png[OSI Layers, 300, 200, link="http://mycomsats.com/blogs/wp-content/uploads/2012/05/image.png"]
+
 The layers are : (from lowest to highest)
 Physical Layer (Layer 1)
 

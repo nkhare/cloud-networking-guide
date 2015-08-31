@@ -5,7 +5,7 @@
 :toc2:
 :toclevels 4:
 :numbered:
-
+:imagesdir: images
 :leveloffset: 1
 
 
