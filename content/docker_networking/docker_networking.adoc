@@ -7,8 +7,283 @@
 :toclevels 4:
 :numbered:
 
+== Docker Networking Options < 1.8
+
+[source,bash]
+$ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: enp0s25: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 68:f7:28:c3:ce:99 brd ff:ff:ff:ff:ff:ff
+    inet 10.70.1.102/23 brd 10.70.1.255 scope global dynamic enp0s25
+       valid_lft 82466sec preferred_lft 82466sec
+    inet6 fe80::6af7:28ff:fec3:ce99/64 scope link 
+       valid_lft forever preferred_lft forever
+3: wlp3s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 34:02:86:b5:a6:3a brd ff:ff:ff:ff:ff:ff
+    inet 10.209.132.227/22 brd 10.209.135.255 scope global dynamic wlp3s0
+       valid_lft 24962sec preferred_lft 24962sec
+    inet6 fe80::3602:86ff:feb5:a63a/64 scope link 
+       valid_lft forever preferred_lft forever
+4: docker0@NONE: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state LOWERLAYERDOWN group default 
+    link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff
+    inet 172.17.42.1/16 scope global docker0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::19:4cff:fe0f:9ed4/64 scope link 
+       valid_lft forever preferred_lft forever
+
+
+- --net=bridge
+
+[source,bash]
+$  docker run -it centos bash 
+[root@7aabf5a92073 /]# ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+9: eth0@if10: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP 
+    link/ether 02:42:ac:11:00:03 brd ff:ff:ff:ff:ff:ff
+    inet 172.17.0.3/16 scope global eth0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::42:acff:fe11:3/64 scope link 
+       valid_lft forever preferred_lft forever
+
+On host 
+
+[source,bash]
+$ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: enp0s25: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 68:f7:28:c3:ce:99 brd ff:ff:ff:ff:ff:ff
+    inet 10.70.1.102/23 brd 10.70.1.255 scope global dynamic enp0s25
+       valid_lft 82367sec preferred_lft 82367sec
+    inet6 fe80::6af7:28ff:fec3:ce99/64 scope link 
+       valid_lft forever preferred_lft forever
+3: wlp3s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 34:02:86:b5:a6:3a brd ff:ff:ff:ff:ff:ff
+    inet 10.209.132.227/22 brd 10.209.135.255 scope global dynamic wlp3s0
+       valid_lft 24863sec preferred_lft 24863sec
+    inet6 fe80::3602:86ff:feb5:a63a/64 scope link 
+       valid_lft forever preferred_lft forever
+4: docker0@NONE: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
+    link/ether 4a:77:36:f8:95:8a brd ff:ff:ff:ff:ff:ff
+    inet 172.17.42.1/16 scope global docker0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::19:4cff:fe0f:9ed4/64 scope link 
+       valid_lft forever preferred_lft forever
+10: vethb34e795@if9: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master docker0 state UP group default 
+    link/ether 4a:77:36:f8:95:8a brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::4877:36ff:fef8:958a/64 scope link 
+       valid_lft forever preferred_lft forever
+
+brctl show 
+
+[source,bash]
+$ brctl show
+bridge name	bridge id		STP enabled	interfaces
+docker0		8000.5a0c73123398	no		vethb34e795
+
+
+[source,bash]
+$ iptables -t nat -L -n
+Chain POSTROUTING (policy ACCEPT)
+target     prot opt source               destination         
+MASQUERADE  all  --  172.17.0.0/16        anywhere            
+
+
+[source,bash]
+$ docker run -it centos bash
+[root@82e43f977d42 /]# tracepath redhat.com
+ 1?: [LOCALHOST]                                         pmtu 1500
+ 1:  172.17.42.1                                           0.043ms 
+ 1:  172.17.42.1                                           0.047ms 
+ 2:  172.17.42.1                                           0.057ms pmtu 1412
+ 2:  10.10.254.253                                       314.306ms 
+ 3:  10.11.0.0                                           298.705ms 
+ 4:  10.11.0.31                                          334.649ms 
+ 5:  redirect-redhat-com.edge.prod.ext.phx2.redhat.com   357.030ms reached
+     Resume: pmtu 1412 hops 5 back 251 
+
+
+- --net=host
+
+[source,bash]
+$ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: enp0s25: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc fq_codel state DOWN group default qlen 1000
+    link/ether 68:f7:28:c3:ce:99 brd ff:ff:ff:ff:ff:ff
+3: wlp3s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 34:02:86:b5:a6:3a brd ff:ff:ff:ff:ff:ff
+    inet 10.209.132.227/22 brd 10.209.135.255 scope global dynamic wlp3s0
+       valid_lft 28337sec preferred_lft 28337sec
+    inet6 fe80::3602:86ff:feb5:a63a/64 scope link 
+       valid_lft forever preferred_lft forever
+4: docker0@NONE: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
+    link/ether d2:83:2e:54:84:4a brd ff:ff:ff:ff:ff:ff
+    inet 172.17.42.1/16 scope global docker0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::8c89:24ff:fef2:6e96/64 scope link 
+       valid_lft forever preferred_lft forever
+8: veth9e56059@if7: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master docker0 state UP group default 
+    link/ether d2:83:2e:54:84:4a brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::d083:2eff:fe54:844a/64 scope link 
+       valid_lft forever preferred_lft forever
+
+Start the container
+
+[source,bash]
+$ docker run -it --net=host centos bash
+[root@dhcp35-118 /]# ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: enp0s25: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc fq_codel state DOWN qlen 1000
+    link/ether 68:f7:28:c3:ce:99 brd ff:ff:ff:ff:ff:ff
+3: wlp3s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP qlen 1000
+    link/ether 34:02:86:b5:a6:3a brd ff:ff:ff:ff:ff:ff
+    inet 10.209.132.227/22 brd 10.209.135.255 scope global dynamic wlp3s0
+       valid_lft 28333sec preferred_lft 28333sec
+    inet6 fe80::3602:86ff:feb5:a63a/64 scope link 
+       valid_lft forever preferred_lft forever
+4: docker0@NONE: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP 
+    link/ether d2:83:2e:54:84:4a brd ff:ff:ff:ff:ff:ff
+    inet 172.17.42.1/16 scope global docker0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::8c89:24ff:fef2:6e96/64 scope link 
+       valid_lft forever preferred_lft forever
+8: veth9e56059@if7: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master docker0 state UP 
+    link/ether d2:83:2e:54:84:4a brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::d083:2eff:fe54:844a/64 scope link 
+       valid_lft forever preferred_lft forever
+
+- --net=<container>
+
+[source,bash]
+$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+9b673692385f        centos              "bash"              5 minutes ago       Up 5 minutes                            sharp_feynman       
+$ docker exec  -it  9b673692385f ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+7: eth0@if8: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP 
+    link/ether 02:42:ac:11:00:02 brd ff:ff:ff:ff:ff:ff
+    inet 172.17.0.2/16 scope global eth0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::42:acff:fe11:2/64 scope link 
+       valid_lft forever preferred_lft forever
+
+Start new container with --net=<container>
+[source,bash]
+$ docker run -it --net=container:9b673692385f centos bash
+[root@9b673692385f /]# ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+7: eth0@if8: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP 
+    link/ether 02:42:ac:11:00:02 brd ff:ff:ff:ff:ff:ff
+    inet 172.17.0.2/16 scope global eth0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::42:acff:fe11:2/64 scope link 
+       valid_lft forever preferred_lft forever
+
+- --net=none
+[source,bash]
+$ docker run -it --net=none centos bash
+[root@060bf0798fd7 /]# ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+
+== Port mapping
+[source,bash]
+$ docker run --expose 80 -i -d -P --name f20 fedora /bin/bash
+c8c3abe42ce25bb9799a2d1f309b03953d32263242cc38653fab48a62fb78790
+$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS                   NAMES
+c8c3abe42ce2        fedora              "/bin/bash"         5 seconds ago       Up 3 seconds        0.0.0.0:32768->80/tcp   f20                 
+9b673692385f        centos              "bash"              55 minutes ago      Up 55 minutes                               sharp_feynma
+
+[source,bash]
+$ docker port f20
+80/tcp -> 0.0.0.0:32768
+
+
+[source,bash]
+$ docker inspect   -f "{{ .NetworkSettings }}" f20
+{ 7cb1dd128a7b5dd052f45334d49745826f51d570ce467cc2cbf288450ddc0e8a 172.17.42.1  0 false 172.17.0.4 16   0 02:42:ac:11:00:04 d25915ffdd0538fc8c62fc44ddd1b98c1cba37b87f8d6aa949e4a898d20fe873 map[] map[80/tcp:[{0.0.0.0 32768}]] /var/run/docker/netns/c8c3abe42ce2 [] []}
+
+
+[source,bash]
+$ iptables -t nat -L -n
+Chain POSTROUTING (policy ACCEPT)
+target     prot opt source               destination         
+MASQUERADE  all  --  172.17.0.0/16        0.0.0.0/0           
+POSTROUTING_direct  all  --  0.0.0.0/0            0.0.0.0/0           
+POSTROUTING_ZONES_SOURCE  all  --  0.0.0.0/0            0.0.0.0/0           
+POSTROUTING_ZONES  all  --  0.0.0.0/0            0.0.0.0/0           
+MASQUERADE  tcp  --  172.17.0.4           172.17.0.4           tcp dpt:80
+Chain DOCKER (2 references)
+target     prot opt source               destination         
+DNAT       tcp  --  0.0.0.0/0            0.0.0.0/0            tcp dpt:32768 to:172.17.0.4:80
+
+
 == Container Linking
-tbd
+[source,bash]
+$ docker run -itd --name server centos bash
+34931726f2c58e1349c202071081d7599781c39a44ac60d0c92ea9da5e847ce3
+
+[source,bash]
+$ docker run  -i -t --link server:web --name client fedora /bin/bash
+[root@2308aeb2e426 /]# cat /etc/hosts
+172.17.0.6	2308aeb2e426
+127.0.0.1	localhost
+::1	localhost ip6-localhost ip6-loopback
+fe00::0	ip6-localnet
+ff00::0	ip6-mcastprefix
+ff02::1	ip6-allnodes
+ff02::2	ip6-allrouters
+172.17.0.5	web 34931726f2c5 server
+[root@2308aeb2e426 /]# env
+HOSTNAME=2308aeb2e426
+TERM=xterm
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+PWD=/
+container_uuid=2308aeb2-e426-2d5e-8756-e71730f9663b
+SHLVL=1
+HOME=/root
+WEB_NAME=/client/web
+_=/usr/bin/env
+
 
 == Using custom bridge instead to default one
 tbd
